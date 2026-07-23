@@ -14,4 +14,4 @@ jobs:
 
     steps:
       - name: print hello
-        run: echo "Hello from GitHub Actions Runner!"
+        run: echo "Hello from GitHub Actions Runner!" > hello.txt
