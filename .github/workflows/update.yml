@@ -11,4 +11,4 @@ jobs:
       - name: update
         run: |
           cd ~
-          sudo update
+          sudo apt update
