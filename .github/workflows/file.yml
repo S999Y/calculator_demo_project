@@ -20,7 +20,7 @@ jobs:
           ssh-keyscan -H ${{ secrets.SERVER_ADDRESS }} >> ~/.ssh/known_hosts
 
       - name: Login server
-        run: ssh -i ${{secrets.SSH_PRIVATE_KEY}} ubuntu@${{secrets.SERVER_ADDRESS}}
+        run: ssh -i ~/.ssh/${{secrets.SSH_PRIVATE_KEY}} ubuntu@${{secrets.SERVER_ADDRESS}}
 
       - name: create file
         run: |
