@@ -1,0 +1,35 @@
+name: Mangae Files
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ssh-login:
+    runs-on: ubuntu-latest
+    environment: server
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/ec2_key
+          chmod 600 ~/.ssh/ec2_key
+          ssh-keyscan -H ${{ secrets.SERVER_ADDRESS }} >> ~/.ssh/known_hosts
+
+      - name: Login server
+        run: ssh -i ${{secrets.SSH_PRIVATE_KEY}} ubuntu@${{secrets.SERVER_ADDRESS}}
+
+      - name: create file
+        run: |
+          cd ~
+          mkdir project
+          echo "console.log('hello, from server');" > project/hello.js
+          cat project/hello.js
+
+      - name: Cleanup SSH Key
+        if: always()
+        run: |
+          rm -f ~/.ssh/ec2_key
