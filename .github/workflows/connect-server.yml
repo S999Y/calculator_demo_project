@@ -1,0 +1,48 @@
+name: Execute Metadata Script
+
+on:
+  workflow_dispatch:
+
+jobs:
+  execute-script:
+    name: Run metadata.sh on EC2
+    runs-on: ubuntu-latest
+    environment: server
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/ec2_key
+          chmod 600 ~/.ssh/ec2_key
+          ssh-keyscan -H ${{ secrets.SERVER_ADDRESS }} >> ~/.ssh/known_hosts
+
+      - name: Download metadata.sh on EC2 from GitHub
+        run: |
+          echo "Downloading metadata.sh directly on EC2 from GitHub..."
+          ssh -i ~/.ssh/ec2_key ${{ secrets.HOST_NAME }}@${{ secrets.SERVER_ADDRESS }} \
+            "curl -fsSL https://raw.githubusercontent.com/sarowar-alam/github-actions-fundamentals/refs/heads/main/metadata.sh \
+              -o /home/${{ secrets.HOST_NAME }}/metadata.sh \
+            && chmod +x /home/${{ secrets.HOST_NAME }}/metadata.sh \
+            && echo 'metadata.sh downloaded and ready'"
+
+      - name: Execute metadata.sh script
+        run: |
+          echo "=================================================="
+          echo "     Executing metadata.sh on EC2 Instance"
+          echo "=================================================="
+          echo ""
+          ssh -i ~/.ssh/ec2_key ${{ secrets.HOST_NAME }}@${{ secrets.SERVER_ADDRESS }} \
+            "/home/${{ secrets.HOST_NAME }}/metadata.sh"
+          echo ""
+          echo "=================================================="
+          echo "         Script Execution Complete"
+          echo "=================================================="
+
+      - name: Cleanup SSH Key
+        if: always()
+        run: |
+          rm -f ~/.ssh/ec2_key
