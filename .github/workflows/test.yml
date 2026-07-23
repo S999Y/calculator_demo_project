@@ -14,4 +14,10 @@ jobs:
 
     steps:
       - name: print hello
-        run: echo "Hello from GitHub Actions Runner!" > hello.txt
+        run: echo "Hello from GitHub Actions Runner!" > ~/hello.txt
+
+      - name: Show file
+        run: |
+          pwd
+          ls -la
+          cat ~/hello.txt
